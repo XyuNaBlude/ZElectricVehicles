@@ -89,8 +89,8 @@ end
 
 
 --Interfaces for AAI_Programmable_Vehicles
-remote.add_interface("AAI_on_entity_deployed", { on_entity_deployed = function(data) return onBuilt_Entity(data.entity) end})
-remote.add_interface("AAI_on_entity_replaced", { on_entity_replaced = function(data) return onBuilt_Entity(data.new_entity) end})
+remote.add_interface("AAI-ZElectricVehicles_on_entity_deployed", { on_entity_deployed = function(data) return onBuilt_Entity(data.entity) end})
+remote.add_interface("AAI-ZElectricVehiclesI_on_entity_replaced", { on_entity_replaced = function(data) return onBuilt_Entity(data.new_entity) end})
 --
 
 
