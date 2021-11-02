@@ -19,7 +19,7 @@ local EQUIPMENT = "zelectric-transformer"
 local FUEL = "zelectric-transformer-power"
 
 if settings.startup["ZElectricVehicles-SpiderFuel"].value then
-VEHICLE_TYPES = {"car", "locomotive", "spider-vehicle"}
+  VEHICLE_TYPES = {"car", "locomotive", "spider-vehicle"}
 else
   VEHICLE_TYPES = {"car", "locomotive"}
 end
@@ -31,13 +31,22 @@ local function isVehicle(entity)
   return false
 end
 
-local function onBuilt(event)
-  local entity = event.entity or event.created_entity
+
+local function onBuilt(entity)
   if not (entity and entity.valid and isVehicle(entity)) then return end  
   if bmspidertrons[entity.name] then return else
   script_data.cars[entity.unit_number % MODULO][entity.unit_number] = entity
     -- game.print("Registered vehicle " .. entity.unit_number)
- end
+  end
+end
+
+
+local function onBuilt_Event(event)	--Adapter for Event
+	onBuilt(event.entity or event.created_entity)
+end
+
+local function onBuilt_Entity(entity)	--Adapter for Entity (currently excess)
+	onBuilt(entity)
 end
 
 local function onMined(event)
@@ -78,6 +87,13 @@ local function onTick(event)
   end
 end
 
+
+--Interfaces for AAI_Programmable_Vehicles
+remote.add_interface("AAI_on_entity_deployed", { on_entity_deployed = function(data) return onBuilt_Entity(data.entity) end})
+remote.add_interface("AAI_on_entity_replaced", { on_entity_replaced = function(data) return onBuilt_Entity(data.new_entity) end})
+--
+
+
 event_handler.add_lib{
   on_init = function() 
   
@@ -95,10 +111,10 @@ event_handler.add_lib{
   end,
   events = {
     [defines.events.on_tick] = onTick,
-    [defines.events.on_built_entity] = onBuilt,
-    [defines.events.on_robot_built_entity] = onBuilt,
-    [defines.events.script_raised_built] = onBuilt,
-    [defines.events.script_raised_revive] = onBuilt,
+    [defines.events.on_built_entity] = onBuilt_Event,
+    [defines.events.on_robot_built_entity] = onBuilt_Event,
+    [defines.events.script_raised_built] = onBuilt_Event,
+    [defines.events.script_raised_revive] = onBuilt_Event,
     [defines.events.on_player_mined_entity] = onMined,
     [defines.events.on_robot_mined_entity] = onMined,
     [defines.events.on_entity_died] = onMined,
